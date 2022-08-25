@@ -1,0 +1,11 @@
+version: 0.2
+phases:
+  pre-build:
+    commands:
+      - echo "Entered the pre-build phase"
+    build:
+      commands:
+        - echo "Entered the build phase"
+        - mvn clean prepare
+    post-build:
+      commands:
