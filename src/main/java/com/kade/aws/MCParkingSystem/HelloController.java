@@ -10,7 +10,7 @@ public class HelloController {
 
     @GetMapping
     public String hello() {
-        return "Hello World! This is develop branch!!!";
+        return "This is the develop branch!";
     }
 }
 
