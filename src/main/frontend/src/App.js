@@ -1,9 +1,3 @@
-<<<<<<< Updated upstream
-import Register from './components/Register';
-import { Route, Routes } from 'react-router-dom';
-import { Link } from 'react-router-dom';
-
-=======
 import { useState } from "react";
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { ProtectRoutes } from "./components/ProtectedRoutes";
@@ -23,19 +17,8 @@ export default function App() {
   const [theme, colorMode] = useMode();
   const location = useLocation();
   const backgroundImage = location.pathname === "/login" ? `url(${img})` : "";
->>>>>>> Stashed changes
 
-function App() {
   return (
-<<<<<<< Updated upstream
-    <main className="app">
-      <Register/>
-    </main>
-  );
-}
-
-export default App;
-=======
     // todo get the email in this class and pass to header as prop, and convert to typescript
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
@@ -67,4 +50,3 @@ export default App;
     </ColorModeContext.Provider>
   );
 }
->>>>>>> Stashed changes

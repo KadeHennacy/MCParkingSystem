@@ -2,6 +2,7 @@ package com.kade.mcps.config;
 
 import com.kade.mcps.filter.CustomAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,6 +18,7 @@ import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import com.kade.mcps.config.JwtAuthenticationEntryPoint;
 
 import static com.kade.mcps.config.JwtConfigurer.jwtConfigurer;
 
@@ -33,6 +35,8 @@ public class SecurityConfiguration {
 
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
 
+    //TODO configure https channel security to protect against mitm attacks
+    // https://medium.com/@rahulgolwalkar/pros-and-cons-in-using-jwt-json-web-tokens-196ac6d41fb4
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         //this is the solution to the circular dependencies from https://github.com/spring-projects/spring-security/issues/10822#issuecomment-1036063319

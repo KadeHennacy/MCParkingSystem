@@ -1,8 +1,8 @@
 package com.kade.mcps.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kade.mcps.config.JwtService;
 import com.kade.mcps.repository.UserRepository;
+import com.kade.mcps.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,14 +28,15 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     private final AuthenticationManager authenticationManager;
 
 
-    private JwtService jwtService;
+    private JwtTokenProvider jwtTokenProvider;
     private UserRepository repository;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-        log.info("email is: {}", email); log.info("Password is: {}", password);
+        log.info("email is: {}", email);
+        log.info("Password is: {}", password);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
         return authenticationManager.authenticate(authenticationToken);
     }
@@ -44,9 +45,9 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-        User user = (User)authResult.getPrincipal();
-        String access_token = jwtService.generateAccessToken(user);
-        String refresh_token = jwtService.generateRefreshToken(user);
+        User user = (User) authResult.getPrincipal();
+        String access_token = jwtTokenProvider.generateAccessToken(user);
+        String refresh_token = jwtTokenProvider.generateRefreshToken(user);
         Map<String, String> tokens = new HashMap<>();
         tokens.put("access_token", access_token);
         tokens.put("refresh_token", refresh_token);

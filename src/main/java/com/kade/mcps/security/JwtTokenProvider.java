@@ -12,14 +12,10 @@ import java.util.*;
 import java.util.function.Function;
 
 @Service
-<<<<<<< Updated upstream:src/main/java/com/kade/mcps/security/JwtUtil.java
-public class JwtUtil {
-=======
-public class JwtService {
+public class JwtTokenProvider {
     private String secret;
     private int jwtExpirationDateInMs;
     private int refreshExpirationDateInMs;
->>>>>>> Stashed changes:src/main/java/com/kade/mcps/config/JwtService.java
 
 
     @Value("${jwt.secret}")

@@ -1,4 +1,4 @@
-package com.kade.mcps.security;
+package com.kade.mcps.payload;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AuthenticationRequestDto {
+public class AuthRequestDto {
     private String email;
     private String password;
 }
