@@ -1,8 +1,8 @@
 package com.kade.mcps.config;
 
 import com.kade.mcps.filter.CustomAuthenticationFilter;
+import com.kade.mcps.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -20,7 +20,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import com.kade.mcps.config.JwtAuthenticationEntryPoint;
 
-import static com.kade.mcps.config.JwtConfigurer.jwtConfigurer;
+
 
 
 // https://www.codejava.net/frameworks/spring-boot/spring-boot-security-authentication-with-jpa-hibernate-and-mysql
@@ -32,6 +32,8 @@ import static com.kade.mcps.config.JwtConfigurer.jwtConfigurer;
 @RequiredArgsConstructor
 public class SecurityConfiguration {
     private final AuthenticationProvider authenticationProvider;
+
+    private final JwtTokenProvider jwtTokenProvider;
 
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
 
@@ -47,7 +49,7 @@ public class SecurityConfiguration {
                 .disable()
                 .cors()
                 .and()
-                .addFilterBefore(corsFilter(), SessionManagementFilter.class)
+//                .addFilterBefore(corsFilter(), SessionManagementFilter.class)
                 .authorizeHttpRequests((authorize) ->
                         authorize.antMatchers("/api/v1/greetings")
                                 .authenticated()
@@ -63,7 +65,7 @@ public class SecurityConfiguration {
                 ).sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
-                .apply(jwtConfigurer());
+                .apply(new JwtConfigurer(jwtTokenProvider));
 //                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
 
@@ -86,14 +88,15 @@ public class SecurityConfiguration {
 
 
 }
-class JwtConfigurer extends AbstractHttpConfigurer<JwtConfigurer, HttpSecurity> {
 
+@RequiredArgsConstructor
+class JwtConfigurer extends AbstractHttpConfigurer<JwtConfigurer, HttpSecurity> {
+    private final JwtTokenProvider jwtTokenProvider;
     public void configure(HttpSecurity builder) {
         AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
-        builder.addFilterBefore(new CustomAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class);
-    }
-    public static JwtConfigurer jwtConfigurer() {
-        return new JwtConfigurer();
+        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager, jwtTokenProvider);
+        customAuthenticationFilter.setFilterProcessesUrl("/api/v1/auth/authenticate");
+        builder.addFilter(customAuthenticationFilter);
     }
 }
 

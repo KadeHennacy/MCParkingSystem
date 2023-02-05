@@ -5,11 +5,13 @@ import com.kade.mcps.repository.UserRepository;
 import com.kade.mcps.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -27,12 +29,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
 
-
-    private JwtTokenProvider jwtTokenProvider;
-    private UserRepository repository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+        // make sure send these as parameters and not in the body
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         log.info("email is: {}", email);
@@ -45,7 +46,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-        User user = (User) authResult.getPrincipal();
+        UserDetails user = (UserDetails) authResult.getPrincipal();
         String access_token = jwtTokenProvider.generateAccessToken(user);
         String refresh_token = jwtTokenProvider.generateRefreshToken(user);
         Map<String, String> tokens = new HashMap<>();
