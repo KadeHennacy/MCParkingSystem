@@ -1,7 +1,8 @@
-package com.kade.mcps.user;
+package com.kade.mcps.payload;
 
 // User data transfer object. This object stores all the data from a frontend user registration request to send to the backend. It gets added to the registration form model as an attribute.
 
+import com.kade.mcps.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,6 +34,6 @@ public class UserDto {
     private String matchingPassword;
 
     // TODO create custom validation annotation https://www.baeldung.com/registration-with-spring-mvc-and-spring-security/# 5.2
-    private UserRole userRole;
+    private Role role;
 
 }

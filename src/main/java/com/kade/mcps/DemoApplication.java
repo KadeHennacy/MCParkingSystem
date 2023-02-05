@@ -1,8 +1,7 @@
 package com.kade.mcps;
-import com.kade.mcps.user.UserDto;
-import com.kade.mcps.user.UserRole;
-import com.kade.mcps.user.UserService;
-import com.kade.mcps.user.UserServiceImpl;
+import com.kade.mcps.payload.UserDto;
+import com.kade.mcps.entity.Role;
+import com.kade.mcps.service.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,8 +18,8 @@ public class DemoApplication {
 	@Bean
 	CommandLineRunner commandLineRunner(UserService userService){
 		return args -> {
-			UserDto user = new UserDto("admin@gmail.com", "admin", "admin", "admin", "admin", UserRole.ADMIN);
-			UserDto user2 = new UserDto("user@gmail.com", "user", "user", "user", "user", UserRole.USER);
+			UserDto user = new UserDto("admin@gmail.com", "admin", "admin", "admin", "admin", Role.ADMIN);
+			UserDto user2 = new UserDto("user@gmail.com", "user", "user", "user", "user", Role.USER);
 			userService.signUpUser(user);
 			userService.signUpUser(user2);
 		};

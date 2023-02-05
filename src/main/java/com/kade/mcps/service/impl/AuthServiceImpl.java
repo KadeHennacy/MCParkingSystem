@@ -1,10 +1,11 @@
-package com.kade.mcps.auth;
+package com.kade.mcps.service.impl;
 
 
+import com.kade.mcps.auth.AuthenticationRequest;
 import com.kade.mcps.config.JwtService;
-import com.kade.mcps.user.User;
-import com.kade.mcps.user.UserRepository;
-import com.kade.mcps.user.UserRole;
+import com.kade.mcps.entity.User;
+import com.kade.mcps.repository.UserRepository;
+import com.kade.mcps.entity.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 // https://www.javainuse.com/webseries/spring-security-jwt/chap7
 @Service
 @RequiredArgsConstructor
-public class AuthenticationService {
+public class AuthServiceImpl {
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -28,7 +29,7 @@ public class AuthenticationService {
                 .lastName(request.getLastname())
                 .username(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .userRole(UserRole.USER)
+                .role(Role.USER)
                 .build();
         repository.save(user);
         var jwtToken = jwtService.generateAccessToken(user);

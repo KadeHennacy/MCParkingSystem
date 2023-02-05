@@ -1,9 +1,6 @@
-package com.kade.mcps.user;
+package com.kade.mcps.entity;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -46,14 +43,14 @@ public class User implements UserDetails {
     private String lastName;
     private String password;
     @Enumerated(EnumType.STRING)
-    private UserRole userRole;
+    private Role role;
     private boolean active;
-    public User(String username, String firstName, String lastName, String password, UserRole userRole, boolean active) {
+    public User(String username, String firstName, String lastName, String password, Role role, boolean active) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
-        this.userRole = userRole;
+        this.role = role;
         this.active = active;
     }
 
@@ -72,7 +69,7 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         SimpleGrantedAuthority authority =
-                new SimpleGrantedAuthority(userRole.name());
+                new SimpleGrantedAuthority(role.name());
         // singletonList is like an array list but immutible https://www.baeldung.com/java-aslist-vs-singletonlist
         return Collections.singletonList(authority);
     }
