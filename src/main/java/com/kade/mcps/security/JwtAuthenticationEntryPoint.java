@@ -1,4 +1,4 @@
-package com.kade.mcps.config;
+package com.kade.mcps.security;
 
 
 import org.springframework.security.core.AuthenticationException;

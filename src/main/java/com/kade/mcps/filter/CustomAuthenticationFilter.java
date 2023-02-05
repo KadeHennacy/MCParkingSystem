@@ -1,6 +1,7 @@
 package com.kade.mcps.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kade.mcps.payload.AuthRequestDto;
 import com.kade.mcps.repository.UserRepository;
 import com.kade.mcps.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -33,13 +34,17 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        // make sure send these as parameters and not in the body
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-        log.info("email is: {}", email);
-        log.info("Password is: {}", password);
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
-        return authenticationManager.authenticate(authenticationToken);
+        try {
+            AuthRequestDto authRequestDto = new ObjectMapper().readValue(request.getInputStream(), AuthRequestDto.class);
+            String email = authRequestDto.getEmail();
+            String password = authRequestDto.getPassword();
+            log.info("email is: {}", email);
+            log.info("Password is: {}", password);
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
+            return authenticationManager.authenticate(authenticationToken);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // this filter will be applied to /api/v1/authenticate in the security config. The client sends a post request with the email and password in the body to this endpoint. The attemptAuthentication method is called, the credentials are used to create a token, the token is used to return an authentication object. If the authentication is successful, this object is passed into the successfulAuthentication method below. It contains the details and persmissions of the authenticated user.

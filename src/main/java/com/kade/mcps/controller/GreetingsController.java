@@ -1,4 +1,4 @@
-package com.kade.mcps;
+package com.kade.mcps.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;

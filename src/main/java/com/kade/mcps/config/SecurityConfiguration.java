@@ -1,6 +1,8 @@
 package com.kade.mcps.config;
 
 import com.kade.mcps.filter.CustomAuthenticationFilter;
+import com.kade.mcps.filter.CustomAuthorizationFilter;
+import com.kade.mcps.security.JwtAuthenticationEntryPoint;
 import com.kade.mcps.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -14,13 +16,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import com.kade.mcps.config.JwtAuthenticationEntryPoint;
-
-
 
 
 // https://www.codejava.net/frameworks/spring-boot/spring-boot-security-authentication-with-jpa-hibernate-and-mysql
@@ -31,10 +29,12 @@ import com.kade.mcps.config.JwtAuthenticationEntryPoint;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
+    private final CustomAuthorizationFilter customAuthorizationFilter;
     private final AuthenticationProvider authenticationProvider;
 
     private final JwtTokenProvider jwtTokenProvider;
 
+    // if I import this it marks this
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
 
     //TODO configure https channel security to protect against mitm attacks
@@ -53,8 +53,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests((authorize) ->
                         authorize.antMatchers("/api/v1/greetings")
                                 .authenticated()
-                                .antMatchers("/api/v1/auth/**", "/", "/index.html", "/static/**",
-                                        "/*.ico", "/*.json", "/*.png")
+                                .antMatchers("/api/v1/auth/**", "/", "/index.html", "/static/**", "/*.ico", "/*.json", "/*.png")
                                 .permitAll()
                                 .antMatchers(HttpMethod.GET, "/**")
                                 .permitAll()
@@ -65,8 +64,9 @@ public class SecurityConfiguration {
                 ).sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
-                .apply(new JwtConfigurer(jwtTokenProvider));
-//                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .apply(new JwtConfigurer(jwtTokenProvider)).
+                and()
+                .addFilterBefore(customAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
 
     }
@@ -86,12 +86,12 @@ public class SecurityConfiguration {
 
     // based on https://blog.trifork.com/2022/02/25/getting-out-of-a-codependent-relationship-or-how-i-moved-to-a-healthy-component-based-spring-security-configuration/
 
-
 }
 
 @RequiredArgsConstructor
 class JwtConfigurer extends AbstractHttpConfigurer<JwtConfigurer, HttpSecurity> {
     private final JwtTokenProvider jwtTokenProvider;
+
     public void configure(HttpSecurity builder) {
         AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager, jwtTokenProvider);

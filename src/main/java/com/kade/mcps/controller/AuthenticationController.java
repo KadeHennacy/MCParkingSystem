@@ -20,14 +20,7 @@ public class AuthenticationController {
 //        return ResponseEntity.ok(service.register(request));
 //    }
 
-    // this is redundant bc in the config you can simple do customAuthenticationFilter.setFilterProcessesUrl("/api/login");
 
-//    @PostMapping("/authenticate")
-//    public ResponseEntity<String> authenticate(
-//            @RequestBody AuthRequestDto request
-//    ) {
-//        return ResponseEntity.ok(service.authenticate(request));
-//    }
 
     @GetMapping("/refresh")
     public ResponseEntity<String> refresh(
