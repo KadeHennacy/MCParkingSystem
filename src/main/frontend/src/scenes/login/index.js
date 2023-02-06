@@ -1,28 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Box, Button, Typography, useTheme, TextField } from "@mui/material";
 import { useDispatch } from "react-redux";
-import { login } from "../../store/reducers/auth";
-import axios from "../../api/axios";
+import { setCredentials } from "../../store/reducers/auth";
+import { useLoginMutation } from "../../store/reducers/auth";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const theme = useTheme();
+  const userRef = useRef();
+  const errRef = useRef();
+  const [user, setUser] = useState("");
+  const [pwd, setPwd] = useState("");
+  const [errMsg, setErrMsg] = useState("");
+  const navigate = useNavigate();
+
+  const [login, { isLoading }] = useLoginMutation();
   const dispatch = useDispatch();
 
-  const handleLogin = async () => {
+  useEffect(() => {
+    userRef.current.focus();
+  }, []);
+
+  useEffect(() => {
+    setErrMsg("");
+  }, [user, pwd]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
     try {
-      const res = await axios.post("/api/v1/auth/authenticate", {
-        email,
-        password,
-      });
-      const token = res.data.token;
-      // Dispatch the login action with the token and email
-      dispatch(login({ token, email }));
-    } catch (error) {
-      console.error(error);
+      const userData = await login({ user, pwd }).unwrap();
+      dispatch(setCredentials({ ...userData, user }));
+      setUser("");
+      setPwd("");
+      navigate("/welcome");
+    } catch (err) {
+      if (!err?.originalStatus) {
+        // isLoading: true until timeout occurs
+        setErrMsg("No Server Response");
+      } else if (err.originalStatus === 400) {
+        setErrMsg("Missing Username or Password");
+      } else if (err.originalStatus === 401) {
+        setErrMsg("Unauthorized");
+      } else {
+        setErrMsg("Login Failed");
+      }
+      errRef.current.focus();
     }
   };
+
+  const handleUserInput = (e) => setUser(e.target.value);
+
+  const handlePwdInput = (e) => setPwd(e.target.value);
 
   return (
     <Box
@@ -40,6 +69,13 @@ export default function Login() {
       border={`1px solid ${theme.palette.primary.main}`}
       backgroundColor={theme.palette.background.lightPaper}
     >
+      <p
+        ref={errRef}
+        className={errMsg ? "errmsg" : "offscreen"}
+        aria-live="assertive"
+      >
+        {errMsg}
+      </p>
       <Typography variant="h4" align="center" gutterBottom>
         Login
       </Typography>
@@ -49,8 +85,9 @@ export default function Login() {
           variant="outlined"
           type="text"
           label="Email"
-          onChange={(e) => setEmail(e.target.value)}
-          value={email}
+          ref={userRef}
+          onChange={handleUserInput}
+          value={user}
         />
       </Box>
       <Box mb={2}>
@@ -59,14 +96,14 @@ export default function Login() {
           variant="outlined"
           type="password"
           label="Password"
-          onChange={(e) => setPassword(e.target.value)}
-          value={password}
+          onChange={handlePwdInput}
+          value={pwd}
         />
       </Box>
       <Button
         variant="contained"
         color="primary"
-        onClick={handleLogin}
+        onClick={handleSubmit}
         style={{ backgroundColor: theme.palette.primary.main }}
       >
         Login

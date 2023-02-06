@@ -1,35 +1,39 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { setCookie, removeCookie } from "react-cookie";
-import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-
-const backendURL = "http://localhost:8080";
+import { apiSlice } from "./api";
 
 const authSlice = createSlice({
   name: "auth",
-  initialState: {
-    authenticated: false,
-    token: getCookie("token"),
-    email: getCookie("email"),
-  },
+  initialState: { user: null, token: null },
   reducers: {
-    login: (state, action) => {
-      state.authenticated = true;
-      state.token = action.payload.token;
-      state.email = action.payload.email;
-      setCookie("token", action.payload.token);
-      setCookie("email", action.payload.email);
+    setCredentials: (state, action) => {
+      const { user, accessToken } = action.payload;
+      state.user = user;
+      state.token = accessToken;
     },
     logout: (state) => {
-      state.authenticated = false;
+      state.user = null;
       state.token = null;
-      state.email = null;
-      removeCookie("token");
-      removeCookie("email");
     },
   },
 });
 
-export const { login, logout } = authSlice.actions;
+export const { setCredentials, logout } = authSlice.actions;
 
 export default authSlice.reducer;
+
+export const selectCurrentUser = (state) => state.auth.user;
+export const selectCurrentToken = (state) => state.auth.token;
+
+export const authApiAlice = apiSlice.injectEndpoints({
+  endpoints: (builder) => ({
+    login: builder.mutation({
+      query: (credentials) => ({
+        url: "/api/v1/auth/authenticate",
+        method: "POST",
+        body: { ...credentials },
+      }),
+    }),
+  }),
+});
+
+export const { useLoginMutation } = authApiAlice;

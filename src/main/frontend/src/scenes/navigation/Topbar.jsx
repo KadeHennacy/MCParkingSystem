@@ -11,13 +11,13 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import styled from "@emotion/styled";
-import { useCookies } from "react-cookie";
+import { useSelector } from "react-redux";
 
 import { useLocation } from "react-router-dom";
 
 const Topbar = () => {
   const location = useLocation();
-  const [cookies] = useCookies(["token"]);
+  const token = useSelector((state) => state.auth.token);
   const theme = useTheme();
   const colors = tokens;
   const colorMode = useContext(ColorModeContext);
@@ -60,7 +60,7 @@ const Topbar = () => {
             <LightModeOutlinedIcon />
           )}
         </IconButton>
-        {cookies.token ? (
+        {token ? (
           <>
             <IconButton>
               <NotificationsOutlinedIcon />

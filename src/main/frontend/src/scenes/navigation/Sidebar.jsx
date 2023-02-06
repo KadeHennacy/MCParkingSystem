@@ -16,7 +16,7 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
-import { useCookies } from "react-cookie";
+import { useSelector } from "react-redux";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -35,7 +35,7 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
 
 const Sidebar = () => {
   const theme = useTheme();
-  const [cookies] = useCookies(["email"]);
+  const email = useSelector((state) => state.auth.email);
   const colors = tokens;
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
