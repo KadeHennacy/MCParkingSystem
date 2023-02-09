@@ -1,58 +1,53 @@
-import LoginPage from './pages/LoginPage';
-import HomePage from './pages/HomePage';
-import BookList from './components/BookList';
-import Book from './components/Book';
-import { Route, Routes } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useState } from "react";
+import { Route, Routes, Navigate, useLocation } from "react-router-dom";
+import { ProtectRoutes } from "./components/ProtectedRoutes";
+import Dashboard from "./scenes/dashboard";
+import Login from "./scenes/login";
+import NotFound from "./scenes/notFound";
+import { Box, dividerClasses, Typography } from "@mui/material";
+import Topbar from "./scenes/navigation/Topbar";
+import Sidebar from "./scenes/navigation/Sidebar";
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import { ColorModeContext, useMode } from "./theme";
+import img from "./assets/loginBackground.jpg";
+import { useSelector } from "react-redux";
 
+export default function App() {
+  const authenticated = useSelector((state) => state.auth.token);
+  const [theme, colorMode] = useMode();
+  const location = useLocation();
+  const backgroundImage = location.pathname === "/login" ? `url(${img})` : "";
 
-function App() {
   return (
-    <>
-      <header>
-        <p> Hello World! </p>
-        <nav>
-          <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/login">Login</Link>
-            </li>
-            <li>
-              <Link to="/books">Books</Link>
-            </li>
-          </ul>
-        </nav>
-      </header>
-      <Routes>
-
-        {/* React Router knows what url the browser is on, so if you're on the root page it will automatically render the home page */}
-        {/* Whaterver is set as the element is what is rendered if the url matches that path, but you can render stuff that stays consisten such as a nav bar also */}
-
-        <Route path="/" element={<HomePage />}></Route>
-        <Route path="/login" element={<LoginPage />}></Route>
-
-        {/* Nested routes */}
-
-        {/* 
-        <Route path="/books" element={<BookList />}></Route>
-        <Route path="/books/:id" element={<Book />}></Route> 
-        Below does same thing
-        */}
-
-        <Route path="books" element={<BookList/>}>
-          <Route path=":id" element={<Book />}></Route>
-        </Route>
-
-
-        {/* 404 page */}
-
-        <Route path="*" element={<h1>404 Page not found!</h1>} />
-
-      </Routes>
-    </>
+    // todo get the email in this class and pass to header as prop, and convert to typescript
+    // TODO use redux rather than contexts for the color mode
+    <ColorModeContext.Provider value={colorMode}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <div
+          className="app"
+          style={{
+            backgroundImage: backgroundImage,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          {authenticated ? <Sidebar /> : <></>}
+          <main className="content">
+            <Topbar />
+            <Routes>
+              <Route
+                path="/login"
+                element={authenticated ? <Navigate to="/" /> : <Login />}
+              />
+              <Route element={<ProtectRoutes />}>
+                <Route path="/" element={<Dashboard />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
+        </div>
+      </ThemeProvider>
+    </ColorModeContext.Provider>
   );
 }
-
-export default App;
