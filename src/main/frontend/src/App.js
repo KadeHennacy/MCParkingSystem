@@ -13,7 +13,7 @@ import img from "./assets/loginBackground.jpg";
 import { useSelector } from "react-redux";
 
 export default function App() {
-  const authenticated = useSelector((state) => state.auth.authenticated);
+  const authenticated = useSelector((state) => state.auth.token);
   const [theme, colorMode] = useMode();
   const location = useLocation();
   const backgroundImage = location.pathname === "/login" ? `url(${img})` : "";

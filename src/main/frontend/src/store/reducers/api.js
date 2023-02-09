@@ -7,8 +7,11 @@ const baseQuery = fetchBaseQuery({
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
     const token = getState().auth.token;
+    const refreshToken = getState().auth.refreshToken;
     if (token) {
       headers.set("Authorization", `Bearer ${token}`);
+    } else if (refreshToken) {
+      headers.set("Authorization", `Bearer ${refreshToken}`);
     }
     return headers;
   },
@@ -21,6 +24,8 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
   // 403 is returned when the token is invalid/expired, 401 is returned when no token is present
   if (result?.error?.originalStatus === 403) {
     console.log("sending refresh token request");
+    // nullify the token in the state before sending the refresh token request so that baseQuery knows to send the refresh token rather than the old token
+    api.dispatch(setCredentials({ token: null }));
     const refreshResult = await baseQuery(
       "/api/v1/auth/refresh",
       api,
@@ -40,6 +45,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
   return result;
 };
 
+// this is a template for all API requests, just inject different endpoints to this slice
 export const apiSlice = createApi({
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({}),

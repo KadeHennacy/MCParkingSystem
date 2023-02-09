@@ -17,6 +17,7 @@ export default function Login() {
   const [login, { isLoading }] = useLoginMutation();
   const dispatch = useDispatch();
 
+  // TODO autofill overlaps with textfield labels before user clicks them
   useEffect(() => {
     userRef.current.focus();
   }, []);
@@ -29,11 +30,15 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const userData = await login({ user, pwd }).unwrap();
+      // server expects the credentials in an object with keys "email" and "password" instead of 'user' and 'pwd' and im too lazy to refactor the whole login component so we destructure the object and rename the keys
+      const userData = await login({ email: user, password: pwd }).unwrap();
+      console.log("userData: " + JSON.stringify(userData));
+      console.log("userData.user: " + userData.user);
+      console.log("user: " + user);
       dispatch(setCredentials({ ...userData, user }));
       setUser("");
       setPwd("");
-      navigate("/welcome");
+      navigate("/");
     } catch (err) {
       if (!err?.originalStatus) {
         // isLoading: true until timeout occurs

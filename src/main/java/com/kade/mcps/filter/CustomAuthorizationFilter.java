@@ -67,7 +67,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (Exception exception) {
             log.error("Error logging in: {}", exception.getMessage());
-            response.setHeader("error", exception.getMessage());
+            // TODO determine if I should even send this, if i do it must be sanitized or thorws invalid char err
+//            response.setHeader("error", exception.getMessage());
             response.setStatus(FORBIDDEN.value());
             //response.sendError(FORBIDDEN.value());
             Map<String, String> error = new HashMap<>();
